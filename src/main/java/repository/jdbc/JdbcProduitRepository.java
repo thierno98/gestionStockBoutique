@@ -33,8 +33,11 @@ public class JdbcProduitRepository implements ProduitRepository {
                 int id = rs.getInt("id");
                 String libelle = rs.getString("libelle");
                 int prixNormale = Integer.parseInt(rs.getString("prixNormale"));
+                int prixMinimale = Integer.parseInt(rs.getString("prixMinimale"));
+                int qteMinimale = Integer.parseInt(rs.getString("qteMinimale"));
+                int qteStock = Integer.parseInt(rs.getString("qteStock"));
                 //mapping retour db (relationnel) avec objet Prestation
-                Produit produit = new Produit( id, libelle, prixNormale);
+                Produit produit = new Produit(id, libelle, prixNormale, qteStock, qteMinimale);
 
                 produits.add(produit);
             }
@@ -58,17 +61,48 @@ public class JdbcProduitRepository implements ProduitRepository {
 
             statement.setInt(1, id);
             ResultSet rs = statement.executeQuery();
-            String libelle = rs.getString("libelle");
-            int prixNormale = Integer.parseInt(rs.getString("prixNormale"));
-            //mapping retour db (relationnel) avec objet Prestation
-            Produit produit = new Produit( id, libelle, prixNormale);
-            return produit
-                    ;
+            if(rs.next())
+            {
+                String libelle = rs.getString("libelle");
+                int prixNormale = Integer.parseInt(rs.getString("prixNormale"));
+                int prixMinimale = Integer.parseInt(rs.getString("prixMinimale"));
+                int qteMinimale = Integer.parseInt(rs.getString("qteMinimale"));
+                int qteStock = Integer.parseInt(rs.getString("qteStock"));
+                //mapping retour db (relationnel) avec objet Prestation
+                Produit produit = new Produit(id, libelle, prixNormale, qteStock, qteMinimale);
+                return produit;
+            }
         }
         catch (Exception ex){
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public void addProduit(Produit produit) {
+        String query =  "INSERT INTO personne(id, libelle, prixMinimal, prixNormale" +
+                ",qteMinimale, qteStock) VALUES ("+ produit.getId() +",'"+ produit.getLibelle() + "','" +
+                produit.getPrixMinimal() + "', '" + produit.getPrixNormale()+ "', '" + produit.getQteMinimale()+ "', '" +
+                 produit.getQteStock()+"')";
+
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteProduit(Produit produit) {
+        String query = "DELETE from produit where id = " + produit.getId();
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }

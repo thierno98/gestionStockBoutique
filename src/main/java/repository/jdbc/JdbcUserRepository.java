@@ -41,7 +41,7 @@ public class JdbcUserRepository implements UserRepository {
                 //DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
                 //Date dateNaissance = format.parse(rs.getString("dateReception"));
                 //mapping retour db (relationnel) avec objet Prestation
-                User user = new User( id, login, password, nom, null, prenom,
+                User user = new User( id, login, password, nom, prenom,
                         adresse, telephone, null, null, null);
 
                 users.add(user);
@@ -59,30 +59,59 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     public User getById(int id) {
-        String query = "SELECT id, nom from prestation where id = ?";
+        String query = "SELECT * from user where id = ?";
         try {
             Connection connection = dataSource.createConnection();
             PreparedStatement statement = connection.prepareStatement(query);
 
             statement.setInt(1, id);
             ResultSet rs = statement.executeQuery();
-            String login = rs.getString("login");
-            String password = rs.getString("password");
-            String nom = rs.getString("nom");
-            String prenom = rs.getString("prenom");
-            String numero = rs.getString("numero");
-            String adresse = rs.getString("adresse");
-            String telephone = rs.getString("telephone");
-            DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
-            Date dateNaissance = format.parse(rs.getString("dateReception"));
-            //mapping retour db (relationnel) avec objet Prestation
-            User user = new User( id, login, password, nom, numero, prenom,
-                    adresse, telephone, dateNaissance, null, null);
-            return user;
+            if(rs.next())
+            {
+                String login = rs.getString("login");
+                String password = rs.getString("password");
+                String nom = rs.getString("nom");
+                String prenom = rs.getString("prenom");
+                String adresse = rs.getString("adresse");
+                String telephone = rs.getString("telephone");
+                DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+                String dateNaissance = rs.getString("dateNaissance");
+                //mapping retour db (relationnel) avec objet Prestation
+                User user = new User( id, login, password, nom, prenom,
+                        adresse, telephone, dateNaissance, null, null);
+                return user;
+
+            }
         }
         catch (Exception ex){
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public void addUser(User user) {
+        String query =  "INSERT INTO user(id, adresse, dateNaissance, login" +
+                ",nom, password, prenom, telephone, profil_id) VALUES ("+ user.getId() +",'"+ user.getAdresse() + "','" +
+                user.getDateNaissance() + "', '" + user.getLogin()+ "', '" + user.getNom()+ "', '" +
+                user.getPassword() + "', '" +user.getPrenom() + "', '" +user.getTelephone() + "', '" + user.getProfil()+"')";
+
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteUser(User user) {
+        String query = "DELETE from user where id = " + user.getId();
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

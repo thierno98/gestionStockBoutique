@@ -5,4 +5,6 @@ import domain.Approvisionnement;
 public interface ApproRepository {
     Approvisionnement[] getAll();
     Approvisionnement getById(int id);
+    void addAppro(Approvisionnement appro);
+    void deleteAppro(Approvisionnement appro);
 }

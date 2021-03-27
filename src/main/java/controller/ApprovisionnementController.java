@@ -7,43 +7,46 @@ import service.MenuService;
 import service.console.ConsoleDisplayService;
 import service.console.ScannerMenuService;
 
-public class CommandeController {
+import java.text.ParseException;
+
+public class ApprovisionnementController {
     private final DisplayService displayService ;
     private final MenuService scannerMenuService ;
     ProduitRepository produitRepository;
     UserRepository userRepository;
     CommandeRepository commandeRepository;
-    public CommandeController(){
+    ApproRepository approRepository;
+    public ApprovisionnementController(){
         DataSource dataSource = new MysqlDataSource();
         produitRepository = new JdbcProduitRepository(dataSource);
         userRepository = new JdbcUserRepository(dataSource);
         commandeRepository = new JdbcCommandeRepository(dataSource);
+        approRepository = new JdbcApproRepository(dataSource);
         displayService = new ConsoleDisplayService(produitRepository);
         scannerMenuService = new ScannerMenuService(dataSource, displayService);
     }
 
-    public void process()
-    {
+    public void process() throws ParseException {
         int choix = -1;
         while(choix != 4)
         {
             clearConsole();
-            displayService.afficherMenuCommande();
+            displayService.afficherMenuAppro();
             choix = scannerMenuService.faireChoixMenu(4);
             switch(choix)
             {
                 case 1:
                     clearConsole();
-                    scannerMenuService.ajouterCommande();
+                    scannerMenuService.ajouterAppro();
                     break;
                 case 2:
                     clearConsole();
-                    displayService.afficherListeCommandes(commandeRepository.getAll());
+                    displayService.afficherListeAppros(approRepository.getAll());
                     scannerMenuService.flush();
                     break;
                 case 3:
                     clearConsole();
-                    scannerMenuService.rechercherCommande();
+                    scannerMenuService.rechercherAppro();
                     scannerMenuService.flush();
                     break;
             }

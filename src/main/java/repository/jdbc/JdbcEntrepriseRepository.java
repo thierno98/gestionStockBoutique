@@ -1,16 +1,15 @@
 package repository.jdbc;
 
-import domain.Approvisionnement;
-import domain.Client;
-import domain.Entreprise;
-import domain.Personne;
+import domain.*;
+import repository.EntrepriseRepository;
 
+import java.sql.*;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
 
-public class JdbcEntrepriseRepository {
+public class JdbcEntrepriseRepository implements EntrepriseRepository {
 
     private final DataSource dataSource;
     public JdbcEntrepriseRepository(DataSource dataSource) {
@@ -19,83 +18,88 @@ public class JdbcEntrepriseRepository {
     Scanner input = new Scanner(System.in);  // Create a Scanner object
 
 
-    public void AddEntreprise(List<Entreprise> _entreprises, List<Client> _clients)
-    {
-        Entreprise e = new Entreprise();
-        e.setId(_entreprises.size() + 1);
-        e.setNumero("PSE-00" + _entreprises.size() + 1);
-        System.out.println("SAISIR L'ADRESSE");
-        e.setAdresse(input.nextLine());
-        System.out.println("SAISIR LE NOM");
-        e.setNom(input.nextLine());
-        System.out.println("SAISIR LE TELEPHONE");
-        e.setTel(input.nextLine());
-        System.out.println("SAISIR L'EMAIL");
-        e.setEmail(input.nextLine());
-        Client c = new Client();
-        c.setMatricule(e.getNumero());
-        c.setEntreprise(e);
-        _clients.add(c);
-    }
+    public Entreprise[] getAll()  {
+        //requête sql pour récupèrer les infos
+        String query = "SELECT id, nom FROM prestation";
+        //mapper le résultat
+        List<Entreprise> entreprises = new ArrayList<Entreprise>();
 
-    public void EditEntreprise(List<Entreprise> _entreprises)
-    {
+        try {
+            Connection connection = dataSource.createConnection();
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(query) ;
 
-        System.out.println("SAISIR LE NUMERO DE L'ENTREPRISE");
-        String numero = input.nextLine();
-        for (Entreprise e:_entreprises
-        ) {
-            if(e.getNumero().toLowerCase().equals(numero.toLowerCase()))
-            {
-                System.out.println("SAISIR L'ADRESSE");
-                e.setAdresse(input.nextLine());
-                System.out.println("SAISIR LE NOM");
-                e.setNom(input.nextLine());
-                System.out.println("SAISIR LE TELEPHONE");
-                e.setTel(input.nextLine());
-                System.out.println("SAISIR L'EMAIL");
-                e.setEmail(input.nextLine());
+            while (rs.next()) {
+                DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+                long _id = rs.getInt("id");
+                String _adresse = rs.getString("adresse");
+                String _email = rs.getString("email");
+                String _nom = rs.getString("nom");
+                String _tel = rs.getString("tel");
+                int _client = rs.getInt("client_id");
+                //mapping retour db (relationnel) avec objet Prestation
+                Entreprise entreprise = new Entreprise(_id, _nom, _adresse, _tel, _email);
+                entreprises.add(entreprise);
             }
+            return entreprises.toArray(new Entreprise[0]);
+
+        }
+        catch (SQLException e) {
+            return new Entreprise[0];
+        }
+        catch (Exception ex){
+            return new Entreprise[0];
         }
     }
 
-    public void DeletesEntreprise(List<Entreprise> _entreprises, List<Client> _clients)
-    {
+    public Entreprise getById(int id) {
+        String query = "SELECT id, nom from client where id = ?";
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
 
-        System.out.println("SAISIR LE NUMERO DE L'ENTREPRISE");
-        String numero = input.nextLine();
-        for (Entreprise e:_entreprises
-        ) {
-            if(e.getNumero().toLowerCase().equals(numero.toLowerCase()))
+            statement.setInt(1, id);
+            ResultSet rs = statement.executeQuery();
+            if(rs.next())
             {
-                DeleteClient(e.getNumero(), _clients);
-                _entreprises.remove(e);
+                String _adresse = rs.getString("adresse");
+                String _email = rs.getString("email");
+                String _nom = rs.getString("nom");
+                String _tel = rs.getString("tel");
+                int _client = rs.getInt("client_id");
+                //mapping retour db (relationnel) avec objet Prestation
+                Entreprise entreprise = new Entreprise(id, _nom, _adresse, _tel, _email);
+                return entreprise;
             }
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public void addEntreprise(Entreprise entreprise) {
+        String query =  "INSERT INTO entreprise(id, adresse, email, nom" +
+                ",tel) VALUES ("+ entreprise.getId() +",'"+ entreprise.getAdresse() + "','" +
+                entreprise.getEmail() + "', '" + entreprise.getNom()+ "', '" + entreprise.getTel()+"')";
+
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
-    public void DeleteClient(String _numero, List<Client> _clients)
-    {
-        for (Client c: _clients
-             ) {
-            if(c.getMatricule().toLowerCase().equals(_numero.toLowerCase()))
-            {
-                _clients.remove(c);
-            }
-        }
-    }
-
-    public  void ShowAllEntreprise(List<Entreprise> _entreprises)
-    {
-
-        System.out.println("SAISIR LE NUMERO DE L'ENTREPRISE");
-        String numero = input.nextLine();
-        for (Entreprise e:_entreprises
-        ) {
-            System.out.println("ADRESSE: " + e.getAdresse());
-            System.out.println("NOM: " + e.getNom());
-            System.out.println("TELEPHONE: " + e.getTel());
-            System.out.println("EMAIL: " + e.getEmail());
+    public void deleteEntreprise(Entreprise entreprise) {
+        String query = "DELETE from entreprise where id = " + entreprise.getId();
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

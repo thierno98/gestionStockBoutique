@@ -13,9 +13,8 @@ public class User {
     private String prenom;
     private String adresse;
     private String telephone;
-    private Date dateNaissance;
-    private Profil profil;
-    private List<Commande> commande;
+    private String dateNaissance;
+    private int profil;
 
     public long getId() {
         return id;
@@ -81,44 +80,35 @@ public class User {
         this.telephone = telephone;
     }
 
-    public Date getDateNaissance() {
+    public String getDateNaissance() {
         return dateNaissance;
     }
 
-    public void setDateNaissance(Date dateNaissance) {
+    public void setDateNaissance(String dateNaissance) {
         this.dateNaissance = dateNaissance;
     }
 
-    public Profil getProfil() {
+
+    public int getProfil() {
         return profil;
     }
 
-    public void setProfil(Profil profil) {
+    public void setProfil(int profil) {
         this.profil = profil;
     }
 
-    public List<Commande> getCommande() {
-        return commande;
-    }
-
-    public void setCommande(List<Commande> commande) {
-        this.commande = commande;
-    }
-
-    public User(long _id, String _login, String _password, String _nom, String _numero, String _prenom,
-            String _adresse, String _telephone, Date _dateNaissance, Profil _profil, List<Commande> _commande)
+    public User(long _id, String _login, String _password, String _nom, String _prenom,
+                String _adresse, String _telephone, String _dateNaissance, Profil _profil, List<Commande> _commande)
     {
         id = _id;
         login = _login;
         password = _password;
         nom = _nom;
-        numero = _numero;
         prenom = _prenom;
         adresse = _adresse;
         telephone = _telephone;
         dateNaissance = _dateNaissance;
-        profil = _profil;
-        commande = _commande;
+
     }
 
     public User()

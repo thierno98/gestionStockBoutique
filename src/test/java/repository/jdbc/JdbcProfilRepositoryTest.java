@@ -19,17 +19,20 @@ class JdbcProfilRepositoryTest {
     void setUp() throws SQLException {
         System.out.println("Dans la méthode setup");
         //Arrange
-        DataSource dataSource = new MockDatasource();
+        DataSource dataSource = new MysqlDataSource();
         jdbcBasedProfilRepository = new JdbcProfilRepository(dataSource);
+
+        System.out.println("counted " + dataSource);
+        System.out.println("counted " + jdbcBasedProfilRepository.getAll().length);
     }
     @Test
     void getAll() {
 
-        System.out.println("Dans la méthode get prestations");
+        System.out.println("Dans la méthode get profils");
         //Act
-        Profil[] prestations = jdbcBasedProfilRepository.getAll();
+        Profil[] profils = jdbcBasedProfilRepository.getAll();
         //Assert
-        assertEquals(4, prestations.length, "le nombre de profils doit être 3");
+        assertEquals(4, profils.length, "le nombre de profils doit être 3");
     }
 
     @Test
@@ -71,5 +74,26 @@ class JdbcProfilRepositoryTest {
         assertNotNull(profil);
         assertEquals(5, profil.getId());
         assertEquals("ok", profil.getLibelle());
+    }
+
+    @Test
+    void addProfil() {
+        Profil profil = new Profil();
+        profil.setId(200);
+        profil.setLibelle("Admin");
+        jdbcBasedProfilRepository.addProfil(profil);
+        Profil retrievedProfil = jdbcBasedProfilRepository.getById(200);
+        assertEquals(profil.getId(), retrievedProfil.getId());
+        jdbcBasedProfilRepository.deleteProfil(jdbcBasedProfilRepository.getById(200));
+    }
+
+    @Test
+    void deleteProfil() {
+        Profil profil = new Profil();
+        profil.setId(201);
+        profil.setLibelle("Admin");
+        jdbcBasedProfilRepository.addProfil(profil);
+        jdbcBasedProfilRepository.deleteProfil(profil);
+        assertEquals(null, jdbcBasedProfilRepository.getById(201));
     }
 }

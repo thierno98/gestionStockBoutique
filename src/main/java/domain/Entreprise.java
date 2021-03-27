@@ -55,4 +55,17 @@ public class Entreprise {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public Entreprise(long _id, String _nom, String _adresse, String _tel, String _email)
+    {
+        id = _id;
+        nom = _nom;
+        adresse = _adresse;
+        tel = _tel;
+        email = _email;
+    }
+    public Entreprise()
+    {
+
+    }
 }

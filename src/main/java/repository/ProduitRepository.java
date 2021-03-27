@@ -6,4 +6,6 @@ import domain.Produit;
 public interface ProduitRepository {
     Produit[] getAll();
     Produit getById(int id);
+    void addProduit(Produit produit);
+    void deleteProduit(Produit produit);
 }

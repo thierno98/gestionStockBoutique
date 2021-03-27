@@ -6,8 +6,16 @@ public class Approvisionnement {
     private long id;
     public int QteProduitInitial;
     public int QteProduitEncours;
-    private Date DateReception;
-    private Produit produit;
+    private String DateReception;
+    private int  produit;
+
+    public int getProduit() {
+        return produit;
+    }
+
+    public void setProduit(int produit) {
+        this.produit = produit;
+    }
 
     public long getId() {
         return id;
@@ -33,24 +41,18 @@ public class Approvisionnement {
         QteProduitEncours = qteProduitEncours;
     }
 
-    public Date getDateReception() {
+    public String getDateReception() {
         return DateReception;
     }
 
-    public void setDateReception(Date dateReception) {
+    public void setDateReception(String dateReception) {
         DateReception = dateReception;
     }
 
-    public Produit getProduit() {
-        return produit;
-    }
 
-    public void setProduit(Produit produit) {
-        this.produit = produit;
-    }
 
-    public Approvisionnement(long _id, int _qteProduitInitial, int _qteProduitEnCours, Date _dateReception,
-                             Produit _produit)
+    public Approvisionnement(long _id, int _qteProduitInitial, int _qteProduitEnCours, String _dateReception,
+                             int _produit)
     {
         id = _id;
         QteProduitInitial = _qteProduitInitial;

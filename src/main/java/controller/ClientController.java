@@ -7,44 +7,55 @@ import service.MenuService;
 import service.console.ConsoleDisplayService;
 import service.console.ScannerMenuService;
 
-public class CommandeController {
+import java.text.ParseException;
+
+public class ClientController {
     private final DisplayService displayService ;
     private final MenuService scannerMenuService ;
     ProduitRepository produitRepository;
     UserRepository userRepository;
-    CommandeRepository commandeRepository;
-    public CommandeController(){
+    EntrepriseRepository entrepriseRepository;
+    PersonneRepository personneRepository;
+    public ClientController(){
         DataSource dataSource = new MysqlDataSource();
         produitRepository = new JdbcProduitRepository(dataSource);
         userRepository = new JdbcUserRepository(dataSource);
-        commandeRepository = new JdbcCommandeRepository(dataSource);
+        entrepriseRepository = new JdbcEntrepriseRepository(dataSource);
+        personneRepository = new JdbcPersonneRepository(dataSource);
         displayService = new ConsoleDisplayService(produitRepository);
         scannerMenuService = new ScannerMenuService(dataSource, displayService);
     }
 
-    public void process()
-    {
+    public void process() throws ParseException {
         int choix = -1;
-        while(choix != 4)
+        while(choix != 6)
         {
             clearConsole();
-            displayService.afficherMenuCommande();
-            choix = scannerMenuService.faireChoixMenu(4);
+            displayService.afficherMenuClient();
+            choix = scannerMenuService.faireChoixMenu(6);
             switch(choix)
             {
                 case 1:
                     clearConsole();
-                    scannerMenuService.ajouterCommande();
+                    scannerMenuService.ajouterClient();
                     break;
                 case 2:
                     clearConsole();
-                    displayService.afficherListeCommandes(commandeRepository.getAll());
+                    displayService.afficherListeClients(entrepriseRepository.getAll(), personneRepository.getAll());
                     scannerMenuService.flush();
                     break;
                 case 3:
                     clearConsole();
-                    scannerMenuService.rechercherCommande();
+                    scannerMenuService.rechercherEntreprise();
                     scannerMenuService.flush();
+                    break;
+                case 4:
+                    clearConsole();
+                    scannerMenuService.rechercherPersonne();
+                    break;
+                case 5:
+                    clearConsole();
+                    scannerMenuService.supprimerClient();
                     break;
             }
         }

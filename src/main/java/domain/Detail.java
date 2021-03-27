@@ -4,8 +4,8 @@ public class Detail {
     private long id;
     private String numeroProduit;
     int quantite;
-    private Commande commande;
-    private Produit produit;
+    private int commande;
+    private int produit;
 
     public long getId() {
         return id;
@@ -31,19 +31,19 @@ public class Detail {
         this.quantite = quantite;
     }
 
-    public Commande getCommande() {
+    public int getCommande() {
         return commande;
     }
 
-    public void setCommande(Commande commande) {
+    public void setCommande(int commande) {
         this.commande = commande;
     }
 
-    public Produit getProduit() {
+    public int getProduit() {
         return produit;
     }
 
-    public void setProduit(Produit produit) {
+    public void setProduit(int produit) {
         this.produit = produit;
     }
 }

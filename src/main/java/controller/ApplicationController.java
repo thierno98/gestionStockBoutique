@@ -7,43 +7,61 @@ import service.MenuService;
 import service.console.ConsoleDisplayService;
 import service.console.ScannerMenuService;
 
-public class CommandeController {
+import java.text.ParseException;
+
+public class ApplicationController {
     private final DisplayService displayService ;
     private final MenuService scannerMenuService ;
     ProduitRepository produitRepository;
     UserRepository userRepository;
     CommandeRepository commandeRepository;
-    public CommandeController(){
+    ApproRepository approRepository;
+    ApprovisionnementController approvisionnementController = new ApprovisionnementController();
+    ClientController clientController = new ClientController();
+    CommandeController commandeController = new CommandeController();
+    ProduitController produitController = new ProduitController();
+    UserController userController = new UserController();
+    public ApplicationController(){
         DataSource dataSource = new MysqlDataSource();
         produitRepository = new JdbcProduitRepository(dataSource);
         userRepository = new JdbcUserRepository(dataSource);
         commandeRepository = new JdbcCommandeRepository(dataSource);
+        approRepository = new JdbcApproRepository(dataSource);
         displayService = new ConsoleDisplayService(produitRepository);
         scannerMenuService = new ScannerMenuService(dataSource, displayService);
     }
 
-    public void process()
-    {
+    public void process() throws ParseException {
         int choix = -1;
-        while(choix != 4)
+        while(choix != 6)
         {
             clearConsole();
-            displayService.afficherMenuCommande();
-            choix = scannerMenuService.faireChoixMenu(4);
+            displayService.afficherMenuPrincipal();
+            choix = scannerMenuService.faireChoixMenu(6);
             switch(choix)
             {
                 case 1:
                     clearConsole();
-                    scannerMenuService.ajouterCommande();
+                    userController.process();
                     break;
                 case 2:
                     clearConsole();
-                    displayService.afficherListeCommandes(commandeRepository.getAll());
+                    produitController.process();
                     scannerMenuService.flush();
                     break;
                 case 3:
                     clearConsole();
-                    scannerMenuService.rechercherCommande();
+                    approvisionnementController.process();
+                    scannerMenuService.flush();
+                    break;
+                case 4:
+                    clearConsole();
+                    clientController.process();
+                    scannerMenuService.flush();
+                    break;
+                case 5:
+                    clearConsole();
+                    commandeController.process();
                     scannerMenuService.flush();
                     break;
             }

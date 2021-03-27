@@ -4,14 +4,12 @@ import java.util.Date;
 
 public class Personne {
     private long id;
-    private String numero;
     private String prenom;
     private String nom;
     private String tel;
     private String email;
     private String adresse;
-    private Date datenaissance;
-    private Client client;
+    private String datenaissance;
 
     public long getId() {
         return id;
@@ -19,14 +17,6 @@ public class Personne {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getNumero() {
-        return numero;
-    }
-
-    public void setNumero(String numero) {
-        this.numero = numero;
     }
 
     public String getPrenom() {
@@ -69,19 +59,28 @@ public class Personne {
         this.adresse = adresse;
     }
 
-    public Date getDatenaissance() {
+    public String getDatenaissance() {
         return datenaissance;
     }
 
-    public void setDatenaissance(Date datenaissance) {
+    public void setDatenaissance(String datenaissance) {
         this.datenaissance = datenaissance;
     }
 
-    public Client getClient() {
-        return client;
+    public Personne (long _id, String _prenom, String _nom, String _tel, String _email, String _adresse,
+                   String _datenaissance)
+    {
+         id= _id;
+        prenom = _prenom;
+        nom = _nom;
+        tel = _tel;
+        email = _email;
+        adresse = _adresse;
+        datenaissance = _datenaissance;
     }
 
-    public void setClient(Client client) {
-        this.client = client;
+    public Personne()
+    {
+
     }
 }

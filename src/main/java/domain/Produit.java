@@ -9,8 +9,6 @@ public class Produit {
     private int qteMinimale;
     private int prixNormale;
     private int prixMinimal;
-    private List<Detail> details;
-    private List<Approvisionnement> approvisionnement;
 
     public long getId() {
         return id;
@@ -60,30 +58,18 @@ public class Produit {
         this.prixMinimal = prixMinimal;
     }
 
-    public List<Detail> getDetails() {
-        return details;
-    }
 
-    public void setDetails(List<Detail> details) {
-        this.details = details;
-    }
-
-    public List<Approvisionnement> getApprovisionnement() {
-        return approvisionnement;
-    }
-
-    public void setApprovisionnement(List<Approvisionnement> approvisionnement) {
-        this.approvisionnement = approvisionnement;
+    public Produit(int _id, String _libelle, int _prixNormale, int _qteStock, int _qteMinimale)
+    {
+        id = _id;
+        libelle = _libelle;
+        prixNormale = _prixNormale;
+        qteStock = _qteStock;
+        qteMinimale = _qteMinimale;
     }
 
     public Produit()
     {
 
-    }
-    public Produit(int _id, String _libelle, int _prixNormale)
-    {
-        id = _id;
-        libelle = _libelle;
-        prixNormale = _prixNormale;
     }
 }

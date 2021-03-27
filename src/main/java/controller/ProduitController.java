@@ -1,23 +1,24 @@
 package controller;
 
 import repository.*;
-import repository.jdbc.*;
+import repository.jdbc.DataSource;
+import repository.jdbc.JdbcProduitRepository;
+import repository.jdbc.JdbcUserRepository;
+import repository.jdbc.MysqlDataSource;
 import service.DisplayService;
 import service.MenuService;
 import service.console.ConsoleDisplayService;
 import service.console.ScannerMenuService;
 
-public class CommandeController {
+public class ProduitController {
     private final DisplayService displayService ;
     private final MenuService scannerMenuService ;
     ProduitRepository produitRepository;
     UserRepository userRepository;
-    CommandeRepository commandeRepository;
-    public CommandeController(){
+    public ProduitController(){
         DataSource dataSource = new MysqlDataSource();
         produitRepository = new JdbcProduitRepository(dataSource);
         userRepository = new JdbcUserRepository(dataSource);
-        commandeRepository = new JdbcCommandeRepository(dataSource);
         displayService = new ConsoleDisplayService(produitRepository);
         scannerMenuService = new ScannerMenuService(dataSource, displayService);
     }
@@ -25,26 +26,30 @@ public class CommandeController {
     public void process()
     {
         int choix = -1;
-        while(choix != 4)
+        while(choix != 5)
         {
             clearConsole();
-            displayService.afficherMenuCommande();
-            choix = scannerMenuService.faireChoixMenu(4);
+            displayService.afficherMenuProduit();
+            choix = scannerMenuService.faireChoixMenu(5);
             switch(choix)
             {
                 case 1:
                     clearConsole();
-                    scannerMenuService.ajouterCommande();
+                    scannerMenuService.ajouterProduit();
                     break;
                 case 2:
                     clearConsole();
-                    displayService.afficherListeCommandes(commandeRepository.getAll());
+                    displayService.afficherListeProduits(produitRepository.getAll());
                     scannerMenuService.flush();
                     break;
                 case 3:
                     clearConsole();
-                    scannerMenuService.rechercherCommande();
+                    scannerMenuService.rechercherProduit();
                     scannerMenuService.flush();
+                    break;
+                case 4:
+                    clearConsole();
+                    scannerMenuService.supprimerProduit();
                     break;
             }
         }

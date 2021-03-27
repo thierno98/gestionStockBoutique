@@ -1,106 +1,111 @@
 package repository.jdbc;
 
-import domain.Client;
-import domain.Paiement;
 import domain.Personne;
 import domain.User;
+import repository.PersonneRepository;
 
+import java.sql.*;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.Date;
 
-public class JdbcPersonneRepository {
+public class JdbcPersonneRepository implements PersonneRepository {
 
     private final DataSource dataSource;
     public JdbcPersonneRepository(DataSource dataSource) {
         this.dataSource = dataSource;
     }
     Scanner input = new Scanner(System.in);  // Create a Scanner object
+    DateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
 
-    public void AddPersonne(List<Personne> _personnes) throws ParseException {
-        Personne p = new Personne();
-        p.setId(_personnes.size() + 1);
-        p.setNumero("PSE-00" + _personnes.size() + 1);
-        System.out.println("SAISIR L'ADRESSE");
-        p.setAdresse(input.nextLine());
-        System.out.println("SAISIR LA DATE DE NAISSANCE ");
-        String date = input.nextLine();
-        p.setDatenaissance(new SimpleDateFormat("dd/MM/yyyy").parse(date));
-        System.out.println("SAISIR LE NOM");
-        p.setNom(input.nextLine());
-        System.out.println("SAISIR LE PRENOM");
-        p.setPrenom(input.nextLine());
-        System.out.println("SAISIR LE TELEPHONE");
-        p.setTel(input.nextLine());
-        System.out.println("SAISIR L'EMAIL");
-        p.setEmail(input.nextLine());
-    }
+    public Personne[] getAll()  {
+        //requête sql pour récupèrer les infos
+        String query = "SELECT id, nom FROM prestation";
+        //mapper le résultat
+        List<Personne> personnes = new ArrayList<Personne>();
 
-    public void EditPersonne(List<Personne> _personnnes) throws ParseException {
-        System.out.println("SAISIR LE NUMERO DE LA PERSONNE");
-        String numero = input.nextLine();
-        for (Personne p:_personnnes
-             ) {
-            if(p.getNumero().toLowerCase().equals(numero.toLowerCase()))
-            {
-                System.out.println("SAISIR L'ADRESSE");
-                p.setAdresse(input.nextLine());
-                System.out.println("SAISIR LA DATE DE NAISSANCE");
-                String date = input.nextLine();
-                p.setDatenaissance(new SimpleDateFormat("dd/MM/yyyy").parse(date));
-                System.out.println("SAISIR LE NOM");
-                p.setNom(input.nextLine());
-                System.out.println("SAISIR LE PRENOM");
-                p.setPrenom(input.nextLine());
-                System.out.println("SAISIR LE TELEPHONE ");
-                p.setTel(input.nextLine());
-                System.out.println("SAISIR L'EMAIL");
-                p.setEmail(input.nextLine());
+        try {
+            Connection connection = dataSource.createConnection();
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(query) ;
+
+            while (rs.next()) {
+                long _id = rs.getInt("id");
+                String _adresse = rs.getString("adresse");
+                String _email = rs.getString("email");
+                String _dateNaissance = rs.getString("datenaissance");
+                String _nom = rs.getString("nom");
+                String _prenom = rs.getString("prenom");
+                String _tel = rs.getString("tel");
+                int  _client = rs.getInt("client_id");
+                //mapping retour db (relationnel) avec objet Prestation
+                Personne personne = new Personne(_id, _prenom, _nom, _tel, _email, _adresse, _dateNaissance);
+                personnes.add(personne);
             }
+            return personnes.toArray(new Personne[0]);
+
+        }
+        catch (SQLException e) {
+            return new Personne[0];
+        }
+        catch (Exception ex){
+            return new Personne[0];
         }
     }
 
-    public void DeletePersonne(List<Personne> _personnnes, List<Client> _clients)
-    {
-        System.out.println("SAISIR LE NUMERO DE LA PERSONNE");
-        String numero = input.nextLine();
-        for (Personne p:_personnnes
-        ) {
-            if(p.getNumero().toLowerCase().equals(numero.toLowerCase()))
+    public Personne getById(int id) {
+        String query = "SELECT * from personne where id = ?";
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            statement.setInt(1, id);
+            ResultSet rs = statement.executeQuery();
+            if(rs.next())
             {
-                DeleteClient(p.getNumero(), _clients);
-                _personnnes.remove(p);
+                String _adresse = rs.getString("adresse");
+                String _email = rs.getString("email");
+                String _dateNaissance = rs.getString("datenaissance");
+                String _nom = rs.getString("nom");
+                String _prenom = rs.getString("prenom");
+                String _tel = rs.getString("tel");
+                int  _client = rs.getInt("client_id");
+                //mapping retour db (relationnel) avec objet Prestation
+                Personne personne = new Personne(id, _prenom, _nom, _tel, _email, _adresse, _dateNaissance);
+                return personne;
             }
         }
-
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return null;
     }
 
+    public void addPersonnne(Personne personne) {
+        String query =  "INSERT INTO personne(id, adresse, datenaissance, email" +
+                ",nom, prenom, tel) VALUES ("+ personne.getId() +",'"+ personne.getAdresse() + "','" +
+                personne.getDatenaissance() + "', '" + personne.getEmail()+ "', '" + personne.getNom()+ "', '" +
+                personne.getPrenom()+ "', '" +personne.getTel()+"')";
 
-    public void DeleteClient(String _numero, List<Client> _clients)
-    {
-        for (Client c: _clients
-        ) {
-            if(c.getMatricule().toLowerCase().equals(_numero.toLowerCase()))
-            {
-                _clients.remove(c);
-            }
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
-    public  void ShowAllPersonne(List<Personne> _personnnes)
-    {
-
-        System.out.println("SAISIR LE NUMERO DE LA PERSONNE");
-        String numero = input.nextLine();
-        for (Personne p:_personnnes
-        ) {
-            System.out.println("ADRESSE PERSONNE: " + p.getAdresse());
-            System.out.println("DATE DE NAISSANCE PERSONNE: " + p.getDatenaissance());
-            System.out.println("NOM PERSONNE: " + p.getNom());
-            System.out.println("PRENOM PERSONNE" + p.getPrenom());
-            System.out.println("TELEPHONE PERSONNE" + p.getTel());
-            System.out.println("EMAIL PERSONNE" + p.getEmail());
+    public void deletePersonne(Personne personne) {
+        String query = "DELETE from personne where id = " + personne.getId();
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

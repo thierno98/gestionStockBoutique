@@ -3,7 +3,6 @@ package repository.jdbc;
 import domain.Produit;
 import domain.Profil;
 import domain.User;
-import repository.ClientRepository;
 import repository.ProfilRepository;
 
 import java.sql.*;
@@ -58,15 +57,40 @@ public class JdbcProfilRepository implements ProfilRepository {
 
             statement.setInt(1, id);
             ResultSet rs = statement.executeQuery();
-            String libelle = rs.getString("libelle");
-            //mapping retour db (relationnel) avec objet Prestation
-            Profil profil = new Profil( id, libelle, null);
-            return profil
-                    ;
+            if(rs.next())
+            {
+                String libelle = rs.getString("libelle");
+                //mapping retour db (relationnel) avec objet Prestation
+                Profil profil = new Profil( id, libelle, null);
+                return profil;
+            }
         }
         catch (Exception ex){
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public void addProfil(Profil profil) {
+        String query =  "INSERT INTO profil(id, libelle) VALUES ("+ profil.getId() +",'"+ profil.getLibelle()+"')";
+
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteProfil(Profil profil) {
+        String query = "DELETE from produit where id = " + profil.getId();
+        try {
+            Connection connection = dataSource.createConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
